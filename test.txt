@@ -1,0 +1,38 @@
+4 11 12 8 13
+3 12 34 42 1
+
+
+
+
+
+
+#echo ${array[*]}
+	#tr -s '[:blank:]' '[\n*]' < data.txt |
+	#while IFS= read -r word; do
+	#	if [ $word -gt $x ]
+	#	then
+	#		echo "$word"
+	#	else
+	#		echo No
+	#	fi
+	#done
+
+
+
+function sortData() {
+	arr=("$@")
+	local length=${#arr[@]}
+	for((i=0;i<$length;++i)) do
+		for((j=i+1;j<$length;++j)) do
+			#echo dada
+   			if [ ${arr[$i]} -gt ${arr[$j]} ]
+			then
+				local temp=0
+				#temp=${arr[$i]}
+				#arr[$i]=${arr[$j]}
+				#arr[$j]=$temp
+			fi
+		done
+	done
+	return 0
+}
