@@ -19,8 +19,8 @@ function arrIndex() {
 	# Fomula: ArrayIndex = col + row*totalCol
 	# table width = 2 column
 
-	local row=$1
-	local col=$2
+	local col=$1
+	local row=$2
 	local totalCol=$3
 	local index=$(( col + row*totalCol ))
 	return $index
@@ -51,10 +51,12 @@ function readOneCol() {
 	local arr=("$@")
 	local length=${#arr[@]}
 	local index=0
+	num=0
 
 	# col=1; totalCol=2
 	for((i=1;i<$length;i+=2)) do
 		subData[$index]=${arr[$i]}
+		((num=num+subData[$index]))
 		((index=index+1))
 	done
 }
@@ -63,21 +65,6 @@ function readOneCol() {
 
 ##################################################################################
 ##### PAPAMETERLESS FUNCTION #####
-
-function Func {
-	FILE="data.txt"
-	OUT=$(awk '{print $2}' $FILE)
-
-	echo $OUT
-	
-	#echo "*** File - $FILE contents ***"
-	#cat $FILE
-
-	#for ip in $OUT ;do
-
-	#	echo $ip
-	#done
-}
 
 function writeData() {
 	local SalesPerson
@@ -88,16 +75,12 @@ function writeData() {
 	if [[ ! "$QuarterlySales" =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]]; then
 		echo "Only number"
 	else 
-		echo "$SalesPerson $QuarterlySales" >> data.txt
+		echo "${SalesPerson// /} $QuarterlySales"  >> data.txt
 	fi
 }
 
 function readData() {
 	# https://unix.stackexchange.com/questions/195224/read-file-word-by-word#comment464849_1
-	#row=0
-	#col=0
-	#pos=row+col*2
-	
 	local index=0
 	while read -ra line; do
     		for word in ${line[@]}; do
@@ -105,20 +88,20 @@ function readData() {
 			((index=index+1))
     		done
 	done < data.txt
-	
-	#echo ${psd[@]}
 }
 
 function readSortedData() {
 	readOneCol ${data[@]}
 	sortData ${subData[@]}
-	echo ${sortedData[@]}
 
 	local length=${#sortedData[@]}
+		printf "|\e[4m%15s\e[0m|\e[4m%15s\e[0m|\n" SalesPerson QuarterlySales
 	for((i=0;i<length;i++)) do
 		local index=${sortedData[$i]}
-		echo ${subdata[$index]}
+		arrIndex 1 $index 2
+		printf "|%15s|%15s|\n" ${data[$(($?-1))]} ${data[$?]}
 	done
+	echo "Total QuarterlySales: "$num
 }
 
 
@@ -130,19 +113,31 @@ function salePerson() {
 	while true
 	do
 		readData
+		printf "\033[0;96mPlease chose the following option:
+1. Show the number of salespersons
+2. Write and save data to the text file !
+3. Show data sort by salary!
+4. Show data sort by alphabet!
+5. Exit
+Option: \033[0m"
 		local input
-		read -p "Please chose from 1 to 5: " input
+		read input
+		input=${input// /} 
 		if ((input==1)); then
+			echo "Total salespersons: "$(( ${#data[@]}/2 ))
+ 		elif ((input==2)); then
 			writeData
-		elif ((input==2)); then
-			echo "test"
 		elif ((input==3)); then
 			readSortedData
 		elif ((input==4)); then
-			echo four
+			cat data.txt | sort
+		elif ((input==5)); then
+			break
 		else
-			echo Nani
+			echo Invail option!
 		fi
+		read -p "press enter to continiue!!!"
+		clear
 		# tableManager 12 14
 		#readData
 	done

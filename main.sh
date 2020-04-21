@@ -1,5 +1,6 @@
 source function.sh
 source saleperson.sh
+source manage.sh
 
 function fun1() {
 	return 1
@@ -13,29 +14,28 @@ function main() {
 	while true
 	do
 		local input
-		read -p "Please chose from 1 to 10: " input
+		printf "\033[0;96mPlease chose the following option:
+1. SalesPersons
+2. Archive
+3. Three
+4. Exit
+Option: \033[0m"
+		read input
 		if ((input==1)); then
+			clear
 			salePerson
-			#readData
-			#sortData "${array[@]}"
-			#echo ${arr[*]}
-			#if fun2; then
-			#	fun1
-			#	echo $?
 		elif ((input==2)); then
-			echo two
+			clear
+			manage
 		elif ((input==3)); then
 			echo three
 		elif ((input==4)); then
-			echo four
-		else
-			echo Nani
-		fi
-
-		read -p "Continiue???" input
-		if ((input==1)); then
+			clear
 			break
+		else
+			echo Invail Input
 		fi
+		read -p "Continiue???"
 		clear
 	done
 	#echo $res
