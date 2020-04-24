@@ -10,7 +10,6 @@ data=()
 subData=() # function return array
 sortedData=() # function return array
 
-
 ##################################################################################
 ##### PARAMETTER FUNCTION #####
 
@@ -110,6 +109,7 @@ function readSortedData() {
 ##### PROGRAM FUNCTION #####
 
 function salePerson() {
+	clear
 	while true
 	do
 		readData
@@ -136,7 +136,7 @@ Option: \033[0m"
 		else
 			echo Invail option!
 		fi
-		read -p "press enter to continiue!!!"
+		read -p "Press Enter to continiue!!!"
 		clear
 		# tableManager 12 14
 		#readData

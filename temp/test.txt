@@ -2,9 +2,9 @@
 3 12 34 42 1
 
 
+* * * * * touch /home/din/Desktop/ok.txt
 
-
-
+* * * * * cd /home/din/Desktop/testFolder && tar -zcvf /home/din/Desktop/archive.tar.gz *
 
 function Func {
 	FILE="data.txt"

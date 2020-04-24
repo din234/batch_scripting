@@ -1,6 +1,6 @@
 source function.sh
-source saleperson.sh
-source manage.sh
+source ./salePerson/saleperson.sh
+source ./manage/manage.sh
 
 function fun1() {
 	return 1
@@ -11,21 +11,20 @@ function fun2() {
 }
 
 function main() {
+	clear
 	while true
 	do
 		local input
 		printf "\033[0;96mPlease chose the following option:
 1. SalesPersons
-2. Archive
+2. Manage
 3. Three
 4. Exit
 Option: \033[0m"
 		read input
 		if ((input==1)); then
-			clear
 			salePerson
 		elif ((input==2)); then
-			clear
 			manage
 		elif ((input==3)); then
 			echo three
@@ -35,7 +34,7 @@ Option: \033[0m"
 		else
 			echo Invail Input
 		fi
-		read -p "Continiue???"
+		read -p "Press Enter to continue!"
 		clear
 	done
 	#echo $res
