@@ -1,26 +1,26 @@
 TIME="* * * * *"
 SOURCE=$PWD
 DESTINATION=$PWD
-CRONJOB="$TIME cd $SOURCE && tar -zcvf $DESTINATION/archive.tar.gz *"
+ARCHIVE_NO=0 	# to prevent overwrite
+
+CRONJOB="$TIME cd $SOURCE && tar -zcvf $DESTINATION/archive$ARCHIVE_NO.tar.gz *"
 
 
 ##################################################################################
 ##### PARAMETTER FUNCTION #####
 
 # Manage Archive file
-function checkDirectionExist(){
-	echo $1
+function checkDirectionExist(){	#	parametter:()
 	local DIRECTORY=$PWD
 
-	if [[ ! -z "$1" ]];then
+	if [[ ! -z "$1" ]];then		# check parametter value not empty
 		DIRECTORY=$1
 	fi
 
-	if [ -d "$DIRECTORY" ]; then 
-		SOURCE=$DIRECTORY
+	if [ -d "$DIRECTORY" ]; then 	# check directories is exist or not
 		return 0
 	else
-		echo "not exist"
+		echo "Directories not exist !!!"
 		return 1
 	fi
 	return 0
@@ -28,17 +28,30 @@ function checkDirectionExist(){
 
 function setTime(){
 	if [[ ! "$1" =~ ^[0-9]+[0-9]+$ ]]; then
-		echo "one"
+		echo "Invaild format for minute!"
 		return 1
 	elif [[ ! "$2" =~ ^[0-9]+[0-9]+$ ]]; then
-		echo "two"
+		echo "Invaild format for hours!"
 		return 1
 	elif [[ ! "$3" =~ ^[0-9]+[0-9]+$ ]]; then
-		echo "three"
+		echo "Invaild format for day!"
 		return 1
 	elif [[ ! "$4" =~ ^[0-9]+[0-9]+$ ]]; then
-		echo "four"
+		echo "Invaild format for month!"
 		return 1
+	fi
+
+	if (( $1 > 59 )); then
+		echo "minute must be between 0-59"
+		return 1
+	elif (( $2 > 23 )); then
+		echo "hour must be between 0-23"
+		return 1
+	elif (( $3 == 0 || $3 > 31 )); then
+		echo "day must be between 1-31"
+		return 1
+	elif (( $4 == 0 || $4 > 12 )); then
+		echo "month must be between 1-12"
 	fi
 
 	#set -f
@@ -52,27 +65,65 @@ function setTime(){
 	#set +f
 }
 
+#function checkTime(){
+#	local check
+#	check=${@}
+	
+#	local min
+#	local hour
+#	local day
+#	local mon
+#	local remain
+#	local temp
+#	while IFS=" " read -r min hour day mon remain
+#	do
+#		temp="$min $hour $day $mon *"
+#		if [[ "$check" == "$temp" ]]; then
+#			return 1
+#		fi
+#	done < "time"
+#	return 0
+#}
+
 ##################################################################################
 ##### PAPAMETERLESS FUNCTION #####
 
 # ARCHIVE
+function checkArchive(){ #	reading line number of cronjob file and insert it into ARCHIVE_NO
+	local index=0
+	local line
+	while IFS= read -r line
+	do
+		((index=index+1))
+	done < "time"
+	ARCHIVE_NO=$index
+}
+
 function updateCronjob(){
-	CRONJOB="$TIME cd $SOURCE && tar -zcvf $DESTINATION/archive.tar.gz *"
+	CRONJOB="$TIME cd $SOURCE && tar -zcvf $DESTINATION/archive$ARCHIVE_NO.tar.gz *"
 }
 
 function sourceFile(){
-	echo "Default location: "$SOURCE
+	echo "Default source location: "$SOURCE
 	local input
 
 	printf "Set new source directory: "
 	read input
 	if checkDirectionExist $input; then
+		SOURCE=$input
 		updateCronjob
 	fi
 }
 
-function destinationFile(){
+function destination(){
+	echo "Default destination: "$DESTINATION
 	local input
+	printf "Set new destination directory to archive file: "
+	read input
+	if checkDirectionExist $input; then
+		DESTINATION=$input
+		updateCronjob
+	fi
 }
 
 function updataTime(){
@@ -105,18 +156,41 @@ function updataTime(){
 
 function writeCronjob() {
 	set -f
-	echo $CRONJOB >> time
-	set +f
-	crontab time
-	#if [[ ! "$QuarterlySales" =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]]; then
-	#	echo "Only number"
-	#else 
-	#	echo "${SalesPerson// /} $QuarterlySales"  >> time
+	#if checkTime $TIME then
+		echo $CRONJOB >> time
+		crontab time	# read crontab file to cronjob
+		echo "Cronjob update successfully!"
+	#else
+		#echo "Time bound exception!!!"
 	#fi
+	set +f
 }
 
 
 # USER
+function addGroup(){
+	echo "test"
+}
+
+
+function addUser(){
+	local username
+
+	printf "Write username: "
+	read username
+	sudo useradd $username
+	echo "New user added!"
+}
+
+function deleteUser() {
+	local username
+	
+}
+
+function editUser() {
+	local username
+}
+
 
 
 ##################################################################################
@@ -124,11 +198,13 @@ function writeCronjob() {
 function archive(){
 	clear
 	while true
-	do
+	do	
+		checkArchive
+		updateCronjob
+
 		set -f
 		echo $CRONJOB
 		set +f
-		readData
 		printf "\033[0;96mPlease chose the following option: \n"
 		printf "1. Time to archive the file \n"
 		printf "2. Source file \n"
@@ -143,6 +219,8 @@ function archive(){
 			updataTime
 		elif ((input==2)); then
 			sourceFile
+		elif ((input==3)); then
+			destination
 		elif ((input==4));then
 			writeCronjob
 		elif ((input==5));then
@@ -157,30 +235,11 @@ function archive(){
 
 
 
-function addGroup(){
-	echo "test"
-}
-
-
-function addUser(){
-	local username
-
-	printf "Write username: "
-	read username
-	useradd $username
-	echo "New user added!"
-}
-
-
-
-
-
-
 function user(){
 	clear
 	while true
 	do
-		readData
+		updateCronJob
 		printf "\033[0;96mPlease chose the following option: \n"
 		printf "1. Add new group \n"
 		printf "2. Add new user \n"
@@ -201,6 +260,8 @@ function user(){
 			echo "three"
 		elif ((input==4));then
 			writeCronjob
+		elif ((input==5));then
+			echo "four"
 		elif ((input==7));then
 			break
 		else
@@ -219,7 +280,7 @@ function manage() {
 	clear
 	while true
 	do
-		readData
+		updateCronjob
 		printf "\033[0;96mPlease chose the following option: \n"
 		printf "1. Archive \n" 
 		printf "2. User \n"
@@ -241,3 +302,4 @@ function manage() {
 		clear
 	done
 }
+manage

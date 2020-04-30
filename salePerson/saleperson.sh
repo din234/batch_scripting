@@ -1,14 +1,9 @@
 
 ##### GLOBAL VARIABLE #####
-
-x=7
-y="dangit"
-# array=()
-array=(1 5 3 2 6 7 8 4 11 3 2 1 5 3 5 6 76 6 6)
-
 data=()
 subData=() # function return array
-sortedData=() # function return array
+sortedIndex=() # function return array
+num=0
 
 ##################################################################################
 ##### PARAMETTER FUNCTION #####
@@ -25,21 +20,42 @@ function arrIndex() {
 	return $index
 }
 
-function sortData() {
-	local arr=("$@")
-	local length=${#arr[@]}
-	sortedData=($(seq 0 1 $(( length-1 )) ))
-
-	for((i=0;i<$length;i++)) do
-		for((j=i+1;j<$length;j++)) do
-   			if (( ${arr[$i]} > ${arr[$j]} )); then
-				local temp=${arr[$i]}
-				arr[$i]=${arr[$j]}
-				arr[$j]=$temp
+#function sortData() {	# selection sort
+#	local arr=("$@")
+#	local length=${#arr[@]}
+#	sortedData=($(seq 0 1 $(( length-1 )) ))
+#	for((i=0;i<$length;i++)) do
+#		for((j=i+1;j<$length;j++)) do
+#   			if (( ${arr[$i]} > ${arr[$j]} )); then
+#				local temp=${arr[$i]}
+#				arr[$i]=${arr[$j]}
+#				arr[$j]=$temp
 				
-				local test=${sortedData[$i]}				
-				sortedData[$i]=${sortedData[$j]}
-				sortedData[$j]=$test
+#				local test=${sortedData[$i]}				
+#				sortedData[$i]=${sortedData[$j]}
+#				sortedData[$j]=$test
+#			fi
+#		done
+#	done
+#	return 0
+#}
+
+
+function bubbleSort() {
+	local arr=("$@")	# get array parametter
+	local length=${#arr[@]}
+	sortedIndex=($(seq 0 1 $(( length-1 )) )) # insert number 1,2,3,4,... into array
+	
+	for((i=0;i<$length-1;i++)) do
+		for((j=0;j<length-i-1;j++)) do
+			if (( ${arr[$j]} > ${arr[$j+1]} )); then
+				local temp=${arr[$j]}
+				arr[$j]=${arr[$j+1]}
+				arr[$j+1]=$temp
+
+				local temp=${sortedIndex[$j]}
+				sortedIndex[$j]=${sortedIndex[$j+1]}
+				sortedIndex[$j+1]=$temp
 			fi
 		done
 	done
@@ -50,12 +66,11 @@ function readOneCol() {
 	local arr=("$@")
 	local length=${#arr[@]}
 	local index=0
-	num=0
 
 	# col=1; totalCol=2
 	for((i=1;i<$length;i+=2)) do
-		subData[$index]=${arr[$i]}
-		((num=num+subData[$index]))
+		subData[$index]=${arr[$i]}	# subData
+		((num=num+subData[$index]))	# Calculate total quarterlySale
 		((index=index+1))
 	done
 }
@@ -90,15 +105,15 @@ function readData() {
 }
 
 function readSortedData() {
-	readOneCol ${data[@]}
-	sortData ${subData[@]}
+	readOneCol ${data[@]}		# read one column from table (quarterly sales column) and store it to subData array
+	bubbleSort ${subData[@]}	# sort subData array
 
-	local length=${#sortedData[@]}
+	local length=${#sortedIndex[@]}
 		printf "|\e[4m%15s\e[0m|\e[4m%15s\e[0m|\n" SalesPerson QuarterlySales
 	for((i=0;i<length;i++)) do
-		local index=${sortedData[$i]}
+		local index=${sortedIndex[$i]}
 		arrIndex 1 $index 2
-		printf "|%15s|%15s|\n" ${data[$(($?-1))]} ${data[$?]}
+		printf "|%15s|%15s|\n" ${data[$(($?-1))]} ${data[$?]}	# show in table form
 	done
 	echo "Total QuarterlySales: "$num
 }
@@ -113,24 +128,28 @@ function salePerson() {
 	while true
 	do
 		readData
-		printf "\033[0;96mPlease chose the following option:
-1. Show the number of salespersons
-2. Write and save data to the text file !
-3. Show data sort by salary!
-4. Show data sort by alphabet!
-5. Exit
-Option: \033[0m"
+		printf "\033[0;96mPlease chose the following option: \n"
+		printf "1. Show the number of salespersons \n"
+		printf "2. Write and save data to the text file ! \n"
+		printf "3. Show data sort by salary! \n"
+		printf "4. Show data sort by alphabet! \n"
+		printf "5. Exit \n"
+		printf "Option: \033[0m"
+
 		local input
 		read input
 		input=${input// /} 
 		if ((input==1)); then
+			#bubbleSort
 			echo "Total salespersons: "$(( ${#data[@]}/2 ))
  		elif ((input==2)); then
 			writeData
 		elif ((input==3)); then
 			readSortedData
 		elif ((input==4)); then
+			readOneCol ${data[@]}
 			cat data.txt | sort
+			echo "Total QuarterlySales: "$num
 		elif ((input==5)); then
 			break
 		else
@@ -142,3 +161,5 @@ Option: \033[0m"
 		#readData
 	done
 }
+salePerson
+
