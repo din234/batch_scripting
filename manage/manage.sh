@@ -126,7 +126,7 @@ function destination(){
 	fi
 }
 
-function updataTime(){
+function updateTime(){
 	local MIN
 	local HOUR
 	local DOM
@@ -169,29 +169,45 @@ function writeCronjob() {
 
 # USER
 function addGroup(){
-	echo "test"
+	local groupname
+	echo "List of username and group: "
+	sudo cat /etc/passwd # show list of user and group
+	read -p "Write groupname: " groupname
+	sudo groupadd $groupname
 }
 
 
 function addUser(){
 	local username
-
-	printf "Write username: "
-	read username
+	echo "List of username and group: "
+	sudo cat /etc/passwd # show list of user and group
+	read -p "Write username: " username
 	sudo useradd $username
-	echo "New user added!"
 }
 
 function deleteUser() {
 	local username
-	
+	echo "List of username and group: "
+	sudo cat /etc/passwd # show list of user and group
+	read -p "Write username: " username
+	sudo userdel $username
+}
+
+function deleteGroup(){
+	local groupname
+	echo "List of username and group: "
+	sudo cat /etc/passwd # show list of user and group
+	read -p "Write groupname: " groupname
+	sudo groupdel $groupname
 }
 
 function editUser() {
-	local username
+	echo "Not available, coming soon!"
 }
 
-
+function editGroup() {
+	echo "Not available, coming soon!"
+}
 
 ##################################################################################
 ##### PROGRAM FUNCTION #####
@@ -216,7 +232,7 @@ function archive(){
 		read input
 		input=${input// /}
 		if ((input==1)); then
-			updataTime
+			updateTime
 		elif ((input==2)); then
 			sourceFile
 		elif ((input==3)); then
@@ -239,7 +255,6 @@ function user(){
 	clear
 	while true
 	do
-		updateCronJob
 		printf "\033[0;96mPlease chose the following option: \n"
 		printf "1. Add new group \n"
 		printf "2. Add new user \n"
@@ -253,15 +268,17 @@ function user(){
 		read input
 		input=${input// /}
 		if ((input==1)); then
-			echo "one"
+			addGroup
 		elif ((input==2)); then
 			addUser
 		elif ((input==3));then
-			echo "three"
+			deleteUser
 		elif ((input==4));then
-			writeCronjob
+			deleteGroup
 		elif ((input==5));then
-			echo "four"
+			editUser
+		elif ((input==6));then
+			editGroup
 		elif ((input==7));then
 			break
 		else

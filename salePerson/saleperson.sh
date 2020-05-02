@@ -86,8 +86,8 @@ function writeData() {
 	read -p "Write Sales Person name: " SalesPerson
 	read -p "Quarter Sales: " QuarterlySales
 
-	if [[ ! "$QuarterlySales" =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]]; then
-		echo "Only number"
+	if [[ ! "$QuarterlySales" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+		echo "Only positive number"
 	else 
 		echo "${SalesPerson// /} $QuarterlySales"  >> data.txt
 	fi
