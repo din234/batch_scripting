@@ -2,3 +2,4 @@
 * * * * * cd /home/din/Desktop/batch_scripting/manage && tar -zcvf /home/din/Desktop/batch_scripting/manage/archive1.tar.gz *
 * * * * * cd /home/din/Desktop/batch_scripting/manage && tar -zcvf /home/din/Desktop/batch_scripting/manage/archive2.tar.gz *
 * * * * * cd /home/din/Desktop/batch_scripting/manage && tar -zcvf /home/din/Desktop/batch_scripting/manage/archive3.tar.gz *
+* * * * * cd /home/din/Desktop/batch_scripting/manage && tar -zcvf /home/din/Desktop/batch_scripting/manage/archive4.tar.gz *
